@@ -3,9 +3,9 @@ import { getEmDashEntry } from "emdash";
 import Base from "../layouts/Base.astro";
 import MarketingBlocks from "../components/MarketingBlocks.astro";
 
-const id = Astro.params.slug;
+const slug = Astro.params.slug;
 
-const { entry: page, cacheHint } = await getEmDashEntry("pages", id);
+const { entry: page, cacheHint } = await getEmDashEntry("pages", slug);
 
 Astro.cache.set(cacheHint);
 
