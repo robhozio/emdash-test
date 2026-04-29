@@ -1,16 +1,53 @@
 ---
-const { slug } = Astro.params;
+import { getEmDashEntry } from "emdash";
+import Base from "../layouts/Base.astro";
+import MarketingBlocks from "../components/MarketingBlocks.astro";
 
-// Get page content from EmDash here
+const slugParam = Astro.params.slug;
+const slug = Array.isArray(slugParam) ? slugParam.join("/") : slugParam;
+
+const { entry: page, cacheHint } = await getEmDashEntry("pages", slug);
+
+Astro.cache.set(cacheHint);
+
+if (!page) {
+	return Astro.redirect("/404");
+}
+
+const pageTitle = page?.data.title;
+const pageContent = page?.data.content;
 ---
 
-<html>
-  <head>
-    <title>CMS Page</title>
-  </head>
-  <body>
-    <main>
-      <!-- Render the CMS page title/content here -->
-    </main>
-  </body>
-</html>
+<Base
+	title={pageTitle !== "Home" ? pageTitle : undefined}
+	description={page?.data.description || pageTitle}
+>
+	{
+		pageContent ? (
+			<MarketingBlocks value={pageContent} />
+		) : (
+			<div class="empty-state">
+				<h1>{pageTitle}</h1>
+				<p>This page does not have content yet.</p>
+			</div>
+		)
+	}
+</Base>
+
+<style>
+	.empty-state {
+		text-align: center;
+		padding: var(--spacing-5xl) var(--spacing-lg);
+		max-width: var(--max-width);
+		margin: 0 auto;
+	}
+
+	.empty-state h1 {
+		margin-bottom: var(--spacing-md);
+	}
+
+	.empty-state p {
+		color: var(--color-muted);
+		margin-bottom: var(--spacing-xl);
+	}
+</style>
