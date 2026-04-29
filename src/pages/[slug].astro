@@ -1,13 +1,15 @@
 ---
-import { getEmDashEntry } from "emdash";
+import { getEmDashEntries } from "emdash";
 import Base from "../layouts/Base.astro";
 import MarketingBlocks from "../components/MarketingBlocks.astro";
 
 const slug = Astro.params.slug;
 
-const { entry: page, cacheHint } = await getEmDashEntry("pages", slug);
+const { entries: pages, cacheHint } = await getEmDashEntries("pages");
 
 Astro.cache.set(cacheHint);
+
+const page = pages.find((entry) => entry.data.slug === slug);
 
 if (!page) {
 	return Astro.redirect("/404");
